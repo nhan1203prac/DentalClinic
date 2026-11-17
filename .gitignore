@@ -1,0 +1,10 @@
+application-local.properties
+.env.local
+storage/
+node_modules/
+target/
+.idea/
+*.iml
+.gradle/
+build/
+dist/
