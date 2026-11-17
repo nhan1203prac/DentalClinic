@@ -1,7 +1,7 @@
+import { useEffect } from 'react'
 import { Alert, Table, Typography } from 'antd'
-import { useQuery } from '@tanstack/react-query'
-import { publicApi } from '../../api/publicApi'
-import { errorMessage } from '../../utils/formErrors'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchServices } from '../../store/servicesSlice'
 import { formatVnd } from '../../utils/format'
 
 const COLUMNS = [
@@ -20,13 +20,24 @@ const COLUMNS = [
 ]
 
 export function ServicePricePage() {
-  const { data, isLoading, error } = useQuery({ queryKey: ['public', 'services'], queryFn: publicApi.services })
+  const dispatch = useDispatch()
+  const { items, status, error } = useSelector((state) => state.services)
+
+  useEffect(() => {
+    dispatch(fetchServices())
+  }, [dispatch])
 
   return (
     <>
       <Typography.Title level={2}>Dịch vụ và bảng giá</Typography.Title>
-      {error && <Alert type="error" showIcon message={errorMessage(error)} style={{ marginBottom: 16 }} />}
-      <Table rowKey="maDichVu" columns={COLUMNS} dataSource={data} loading={isLoading} pagination={false} />
+      {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 16 }} />}
+      <Table
+        rowKey="maDichVu"
+        columns={COLUMNS}
+        dataSource={items}
+        loading={status === 'idle' || status === 'loading'}
+        pagination={false}
+      />
     </>
   )
 }

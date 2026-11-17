@@ -1,26 +1,29 @@
+import { useEffect } from 'react'
 import { Alert, Avatar, Button, Card, Descriptions, Skeleton, Space, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
-import { useQuery } from '@tanstack/react-query'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
-import { ApiError } from '../../api/client'
-import { publicApi } from '../../api/publicApi'
-import { errorMessage } from '../../utils/formErrors'
+import { fetchDoctor } from '../../store/doctorsSlice'
 
 export function DoctorDetailPage() {
   const id = Number(useParams().id)
-  const { data: doctor, isLoading, error } = useQuery({
-    queryKey: ['public', 'doctors', id],
-    queryFn: () => publicApi.doctor(id),
-    enabled: Number.isInteger(id),
-    retry: false,
-  })
+  const dispatch = useDispatch()
+  const { item: doctor, status, error, errorCode } = useSelector((state) => state.doctors.detail)
 
-  if (isLoading) {
+  useEffect(() => {
+    if (Number.isInteger(id)) {
+      dispatch(fetchDoctor(id))
+    }
+  }, [dispatch, id])
+
+  if (!Number.isInteger(id)) {
+    return <Alert type="error" showIcon message="Không tìm thấy bác sĩ" />
+  }
+  if (status === 'idle' || status === 'loading') {
     return <Skeleton active avatar paragraph={{ rows: 4 }} />
   }
-  if (error || !doctor) {
-    const notFound = error instanceof ApiError && error.code === 'DOCTOR_NOT_FOUND'
-    return <Alert type="error" showIcon message={notFound ? 'Không tìm thấy bác sĩ' : errorMessage(error)} />
+  if (status === 'failed' || !doctor) {
+    return <Alert type="error" showIcon message={errorCode === 'DOCTOR_NOT_FOUND' ? 'Không tìm thấy bác sĩ' : error} />
   }
 
   return (

@@ -1,21 +1,28 @@
+import { useEffect } from 'react'
 import { Alert, Avatar, Card, Col, Empty, Row, Skeleton, Typography } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
-import { useQuery } from '@tanstack/react-query'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { publicApi } from '../../api/publicApi'
-import { errorMessage } from '../../utils/formErrors'
+import { fetchDoctors } from '../../store/doctorsSlice'
 
 export function DoctorListPage() {
-  const { data, isLoading, error } = useQuery({ queryKey: ['public', 'doctors'], queryFn: publicApi.doctors })
+  const dispatch = useDispatch()
+  const { items, status, error } = useSelector((state) => state.doctors.list)
+
+  useEffect(() => {
+    dispatch(fetchDoctors())
+  }, [dispatch])
+
+  const isLoading = status === 'idle' || status === 'loading'
 
   return (
     <>
       <Typography.Title level={2}>Đội ngũ bác sĩ</Typography.Title>
-      {error && <Alert type="error" showIcon message={errorMessage(error)} />}
+      {error && <Alert type="error" showIcon message={error} />}
       {isLoading && <Skeleton active avatar paragraph={{ rows: 3 }} />}
-      {data && data.length === 0 && <Empty description="Chưa có bác sĩ" />}
+      {status === 'succeeded' && items.length === 0 && <Empty description="Chưa có bác sĩ" />}
       <Row gutter={[16, 16]}>
-        {data?.map((doctor) => (
+        {items.map((doctor) => (
           <Col key={doctor.maBacSi} xs={24} sm={12} lg={8}>
             <Link to={`/bac-si/${doctor.maBacSi}`}>
               <Card hoverable>

@@ -11,7 +11,7 @@ export const tokenStore = {
   },
 }
 
-// AuthProvider đăng ký hàm này để biết khi phiên hết hạn hẳn (refresh thất bại)
+// store.js đăng ký hàm này để biết khi phiên hết hạn hẳn (refresh thất bại)
 export function setSessionLostHandler(handler) {
   onSessionLost = handler
 }
