@@ -25,6 +25,10 @@ public class BacSiCapNhatRequest extends LienHeRequest {
 
     private String gioiThieu;
 
+    // Link ảnh Cloudinary do frontend tải lên; để trống = không có ảnh
+    @Size(max = 255, message = "Link ảnh tối đa 255 ký tự")
+    private String anhDaiDien;
+
     @NotNull(message = "Trạng thái làm việc không được để trống")
     private TrangThaiLamViec trangThaiLamViec;
 }

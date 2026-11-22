@@ -1,14 +1,20 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setSessionLostHandler } from '../api/client'
 import authReducer, { loggedOut } from './authSlice'
+import doctorAdminReducer from './doctorAdminSlice'
 import doctorsReducer from './doctorsSlice'
+import serviceAdminReducer from './serviceAdminSlice'
 import servicesReducer from './servicesSlice'
+import staffReducer from './staffSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     doctors: doctorsReducer,
     services: servicesReducer,
+    staff: staffReducer,
+    doctorAdmin: doctorAdminReducer,
+    serviceAdmin: serviceAdminReducer,
   },
 })
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.dentalclinic.common.AppException;
+import com.dentalclinic.common.CloudinaryProperties;
 import com.dentalclinic.common.ResponseCode;
 import com.dentalclinic.taikhoan.dto.BacSiCapNhatRequest;
 import com.dentalclinic.taikhoan.dto.BacSiDto;
@@ -20,6 +21,7 @@ import com.dentalclinic.taikhoan.repository.BacSiRepository;
 public class BacSiService {
     private final BacSiRepository bacSiRepository;
     private final TaiKhoanService taiKhoanService;
+    private final CloudinaryProperties cloudinaryProperties;
 
     // Lấy tài khoản qua quan hệ lazy nên cần transaction
     @Transactional(readOnly = true)
@@ -48,6 +50,7 @@ public class BacSiService {
         doctor.setChuyenMon(request.getChuyenMon());
         doctor.setBangCap(request.getBangCap());
         doctor.setGioiThieu(request.getGioiThieu());
+        doctor.setAnhDaiDien(normalizeAvatar(request.getAnhDaiDien()));
         return BacSiDto.of(bacSiRepository.save(doctor));
     }
 
@@ -59,8 +62,21 @@ public class BacSiService {
         doctor.setChuyenMon(request.getChuyenMon());
         doctor.setBangCap(request.getBangCap());
         doctor.setGioiThieu(request.getGioiThieu());
+        doctor.setAnhDaiDien(normalizeAvatar(request.getAnhDaiDien()));
         doctor.setTrangThaiLamViec(request.getTrangThaiLamViec());
         taiKhoanService.applyContact(doctor.getTaiKhoan(), request);
         return BacSiDto.of(doctor);
+    }
+
+    // Rỗng -> null (xóa ảnh); có giá trị thì phải là link Cloudinary của phòng khám
+    private String normalizeAvatar(String url) {
+        if (url == null || url.isBlank()) {
+            return null;
+        }
+        String trimmed = url.trim();
+        if (!cloudinaryProperties.isValidImageUrl(trimmed)) {
+            throw new AppException(ResponseCode.INVALID_AVATAR_URL);
+        }
+        return trimmed;
     }
 }

@@ -11,6 +11,7 @@ public enum ResponseCode {
     SUCCESS(HttpStatus.OK, "Thành công"),
 
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ"),
+    INVALID_AVATAR_URL(HttpStatus.BAD_REQUEST, "Ảnh đại diện phải là link Cloudinary của phòng khám"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Yêu cầu không hợp lệ"),
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "Chưa đăng nhập hoặc phiên đã hết hạn"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Tên đăng nhập hoặc mật khẩu không đúng"),
