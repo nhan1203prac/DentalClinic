@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.dentalclinic.common.ApiResponse;
+import com.dentalclinic.lichlamviec.dto.DoiLichLamViecDto;
+import com.dentalclinic.lichlamviec.dto.LichLamViecCapNhatRequest;
 import com.dentalclinic.lichlamviec.dto.LichLamViecDto;
 import com.dentalclinic.lichlamviec.dto.LichTuanRequest;
 import com.dentalclinic.lichlamviec.dto.SaoChepTuanDto;
@@ -42,6 +46,13 @@ public class LichLamViecController {
     @PreAuthorize("hasRole('CHU_PHONG_KHAM')")
     public ApiResponse<SaoChepTuanDto> copyPreviousWeek(@Valid @RequestBody SaoChepTuanRequest request) {
         return ApiResponse.success(lichLamViecService.copyPreviousWeek(request));
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('CHU_PHONG_KHAM')")
+    public ApiResponse<DoiLichLamViecDto> update(@PathVariable Integer id,
+            @Valid @RequestBody LichLamViecCapNhatRequest request) {
+        return ApiResponse.success(lichLamViecService.update(id, request));
     }
 
     @PutMapping("/tuan")

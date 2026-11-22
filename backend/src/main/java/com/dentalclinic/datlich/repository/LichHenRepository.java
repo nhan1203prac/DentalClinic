@@ -10,6 +10,9 @@ import com.dentalclinic.datlich.entity.TrangThaiLichHen;
 
 public interface LichHenRepository extends JpaRepository<LichHen, Integer> {
 
+    List<LichHen> findByLichLamViec_MaLichAndTrangThaiInOrderByGioHen(Integer scheduleId,
+            Collection<TrangThaiLichHen> statuses);
+
     long countByLichLamViec_MaLich(Integer scheduleId);
 
     long countByLichLamViec_MaLichAndTrangThaiNot(Integer scheduleId, TrangThaiLichHen status);

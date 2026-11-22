@@ -16,6 +16,9 @@ import com.dentalclinic.common.AppException;
 import com.dentalclinic.common.ResponseCode;
 import com.dentalclinic.datlich.entity.TrangThaiLichHen;
 import com.dentalclinic.datlich.repository.LichHenRepository;
+import com.dentalclinic.lichlamviec.dto.DoiLichLamViecDto;
+import com.dentalclinic.lichlamviec.dto.LichHenAnhHuongDto;
+import com.dentalclinic.lichlamviec.dto.LichLamViecCapNhatRequest;
 import com.dentalclinic.lichlamviec.dto.LichLamViecDto;
 import com.dentalclinic.lichlamviec.dto.LichLamViecKhoaRequest;
 import com.dentalclinic.lichlamviec.dto.LichLamViecRequest;
@@ -35,6 +38,10 @@ import com.dentalclinic.taikhoan.repository.BacSiRepository;
 @RequiredArgsConstructor
 public class LichLamViecService {
     private static final int MAX_RANGE_DAYS = 62;
+    // BR-12: khung khám 30 phút
+    private static final int SLOT_MINUTES = 30;
+    // Lịch hẹn chưa khám xong, cần nhân viên xử lý khi buổi làm việc thay đổi
+    private static final List<TrangThaiLichHen> PENDING_STATUSES = List.of(TrangThaiLichHen.da_dat, TrangThaiLichHen.da_den);
 
     private final LichLamViecRepository lichLamViecRepository;
     private final LichHenRepository lichHenRepository;
@@ -86,7 +93,13 @@ public class LichLamViecService {
     // BR-13: chép các buổi lam_viec của tuần trước sang tuần đích (+7 ngày), bỏ qua ngày đã có dòng
     @Transactional
     public SaoChepTuanDto copyPreviousWeek(SaoChepTuanRequest request) {
-        LocalDate targetStart = requireMonday(request.getTuNgay());
+        return copyIntoWeek(request.getTuNgay());
+    }
+
+    // targetStart là thứ Hai của tuần đích; dùng chung cho API và job định kỳ (BR-14)
+    @Transactional
+    public SaoChepTuanDto copyIntoWeek(LocalDate targetWeekStart) {
+        LocalDate targetStart = requireMonday(targetWeekStart);
         LocalDate targetEnd = targetStart.plusDays(6);
 
         Set<String> existing = new HashSet<>();
@@ -118,6 +131,43 @@ public class LichLamViecService {
         }
         return new SaoChepTuanDto(copied, skipped,
                 toDtos(lichLamViecRepository.findInRange(targetStart, targetEnd, null)));
+    }
+
+    // BR-15: chuyển nghỉ hoặc đổi giờ một buổi; lịch hẹn không còn nằm trong buổi được trả về để nhân viên
+    // hủy và thông báo. Hệ thống không tự hủy lịch hẹn.
+    @Transactional
+    public DoiLichLamViecDto update(Integer scheduleId, LichLamViecCapNhatRequest request) {
+        if (request.getGioBatDau() == null && request.getGioKetThuc() == null
+                && request.getTrangThai() == null && request.getGhiChu() == null) {
+            throw new AppException(ResponseCode.INVALID_SCHEDULE, "Không có thông tin nào để cập nhật");
+        }
+        LichLamViec schedule = lichLamViecRepository.findById(scheduleId)
+                .orElseThrow(() -> new AppException(ResponseCode.SCHEDULE_NOT_FOUND));
+
+        LocalTime start = request.getGioBatDau() != null ? request.getGioBatDau() : schedule.getGioBatDau();
+        LocalTime end = request.getGioKetThuc() != null ? request.getGioKetThuc() : schedule.getGioKetThuc();
+        checkHours(start, end);
+        schedule.setGioBatDau(start);
+        schedule.setGioKetThuc(end);
+        if (request.getTrangThai() != null) {
+            schedule.setTrangThai(request.getTrangThai());
+        }
+        if (request.getGhiChu() != null) {
+            schedule.setGhiChu(blankToNull(request.getGhiChu()));
+        }
+
+        // Chỉ lịch chưa khám xong mới cần xử lý; nghỉ thì mọi lịch bị ảnh hưởng, còn lại là lịch ngoài giờ mới
+        List<LichHenAnhHuongDto> affected = lichHenRepository
+                .findByLichLamViec_MaLichAndTrangThaiInOrderByGioHen(scheduleId, PENDING_STATUSES).stream()
+                .filter(appointment -> schedule.getTrangThai() == TrangThaiLich.nghi
+                        || appointment.getGioHen().isBefore(start)
+                        || appointment.getGioHen().plusMinutes(SLOT_MINUTES).isAfter(end))
+                .map(LichHenAnhHuongDto::of)
+                .toList();
+        lichLamViecRepository.save(schedule);
+        long activeCount = lichHenRepository.countByLichLamViec_MaLichAndTrangThaiNot(
+                scheduleId, TrangThaiLichHen.da_huy);
+        return new DoiLichLamViecDto(LichLamViecDto.of(schedule, activeCount), affected);
     }
 
     private static LocalDate requireMonday(LocalDate date) {
@@ -202,10 +252,14 @@ public class LichLamViecService {
 
     // BR-11: giờ tròn :00 hoặc :30, kết thúc sau bắt đầu
     private static void checkHours(LichLamViecRequest cell) {
-        if (!isHalfHour(cell.getGioBatDau()) || !isHalfHour(cell.getGioKetThuc())) {
+        checkHours(cell.getGioBatDau(), cell.getGioKetThuc());
+    }
+
+    private static void checkHours(LocalTime start, LocalTime end) {
+        if (!isHalfHour(start) || !isHalfHour(end)) {
             throw new AppException(ResponseCode.INVALID_SCHEDULE, "Giờ phải tròn :00 hoặc :30");
         }
-        if (!cell.getGioKetThuc().isAfter(cell.getGioBatDau())) {
+        if (!end.isAfter(start)) {
             throw new AppException(ResponseCode.INVALID_SCHEDULE, "Giờ kết thúc phải sau giờ bắt đầu");
         }
     }

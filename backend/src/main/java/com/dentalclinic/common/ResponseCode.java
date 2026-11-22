@@ -24,6 +24,7 @@ public enum ResponseCode {
     ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy tài khoản"),
     STAFF_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy nhân viên"),
     DOCTOR_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy bác sĩ"),
+    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy buổi làm việc"),
     SERVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy dịch vụ"),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "Phương thức không được hỗ trợ"),
     DATA_CONFLICT(HttpStatus.CONFLICT, "Dữ liệu xung đột với dữ liệu đã có"),
