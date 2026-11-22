@@ -8,3 +8,6 @@ target/
 .gradle/
 build/
 dist/
+docs/
+process/
+frontend/.env.example
