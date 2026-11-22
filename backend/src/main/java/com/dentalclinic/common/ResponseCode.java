@@ -12,6 +12,7 @@ public enum ResponseCode {
 
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ"),
     INVALID_AVATAR_URL(HttpStatus.BAD_REQUEST, "Ảnh đại diện phải là link Cloudinary của phòng khám"),
+    INVALID_SCHEDULE(HttpStatus.BAD_REQUEST, "Lịch làm việc không hợp lệ"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Yêu cầu không hợp lệ"),
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "Chưa đăng nhập hoặc phiên đã hết hạn"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Tên đăng nhập hoặc mật khẩu không đúng"),
@@ -26,6 +27,7 @@ public enum ResponseCode {
     SERVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy dịch vụ"),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "Phương thức không được hỗ trợ"),
     DATA_CONFLICT(HttpStatus.CONFLICT, "Dữ liệu xung đột với dữ liệu đã có"),
+    SCHEDULE_HAS_APPOINTMENTS(HttpStatus.CONFLICT, "Ô lịch đã có lịch hẹn, hãy chuyển sang nghỉ để xử lý lịch hẹn"),
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "Tên đăng nhập đã được sử dụng"),
 
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi hệ thống, vui lòng thử lại sau");

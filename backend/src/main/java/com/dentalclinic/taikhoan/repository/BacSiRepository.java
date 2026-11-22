@@ -9,5 +9,7 @@ import com.dentalclinic.taikhoan.entity.TrangThaiLamViec;
 public interface BacSiRepository extends JpaRepository<BacSi, Integer> {
     List<BacSi> findByTrangThaiLamViec(TrangThaiLamViec trangThaiLamViec);
 
+    Optional<BacSi> findByTaiKhoan_MaTaiKhoan(Integer accountId);
+
     Optional<BacSi> findByMaBacSiAndTrangThaiLamViec(Integer maBacSi, TrangThaiLamViec trangThaiLamViec);
 }
