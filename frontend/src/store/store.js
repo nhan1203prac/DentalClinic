@@ -3,6 +3,7 @@ import { setSessionLostHandler } from '../api/client'
 import authReducer, { loggedOut } from './authSlice'
 import doctorAdminReducer from './doctorAdminSlice'
 import doctorsReducer from './doctorsSlice'
+import scheduleReducer from './scheduleSlice'
 import serviceAdminReducer from './serviceAdminSlice'
 import servicesReducer from './servicesSlice'
 import staffReducer from './staffSlice'
@@ -15,6 +16,7 @@ export const store = configureStore({
     staff: staffReducer,
     doctorAdmin: doctorAdminReducer,
     serviceAdmin: serviceAdminReducer,
+    schedule: scheduleReducer,
   },
 })
 

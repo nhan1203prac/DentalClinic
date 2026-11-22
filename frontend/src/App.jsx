@@ -6,11 +6,13 @@ import { AppLayout } from './layouts/AppLayout'
 import { DoctorAdminPage } from './pages/admin/DoctorAdminPage'
 import { ServiceAdminPage } from './pages/admin/ServiceAdminPage'
 import { StaffPage } from './pages/admin/StaffPage'
+import { WeekSchedulePage } from './pages/admin/WeekSchedulePage'
 import { PublicLayout } from './layouts/PublicLayout'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { ComingSoonPage } from './pages/common/ComingSoonPage'
 import { NotFoundPage } from './pages/common/NotFoundPage'
+import { MySchedulePage } from './pages/schedule/MySchedulePage'
 import { DoctorDetailPage } from './pages/public/DoctorDetailPage'
 import { DoctorListPage } from './pages/public/DoctorListPage'
 import { HomePage } from './pages/public/HomePage'
@@ -21,6 +23,8 @@ const APP_PAGES = {
   '/app/nhan-vien': StaffPage,
   '/app/bac-si': DoctorAdminPage,
   '/app/dich-vu': ServiceAdminPage,
+  '/app/lich-tuan': WeekSchedulePage,
+  '/app/lich-lam-viec': MySchedulePage,
 }
 
 // Vào /app thì chuyển tới màn hình đầu tiên trong menu của vai trò
