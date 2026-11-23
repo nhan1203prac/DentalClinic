@@ -18,4 +18,12 @@ public interface LichLamViecRepository extends JpaRepository<LichLamViec, Intege
             @Param("doctorId") Integer doctorId);
 
     Optional<LichLamViec> findByBacSi_MaBacSiAndNgay(Integer doctorId, LocalDate date);
+
+    // Buổi làm việc của các bác sĩ đang làm trong một ngày, kèm bác sĩ để khỏi truy vấn lẻ
+    @Query("""
+            select l from LichLamViec l join fetch l.bacSi b
+            where l.ngay = :date and b.trangThaiLamViec = com.dentalclinic.taikhoan.entity.TrangThaiLamViec.dang_lam
+              and (:doctorId is null or b.maBacSi = :doctorId)
+            order by b.hoTen""")
+    List<LichLamViec> findWorkingOn(@Param("date") LocalDate date, @Param("doctorId") Integer doctorId);
 }

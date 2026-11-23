@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.dentalclinic.common.AppException;
+import com.dentalclinic.common.ClinicProperties;
 import com.dentalclinic.common.ResponseCode;
 import com.dentalclinic.datlich.entity.TrangThaiLichHen;
 import com.dentalclinic.datlich.repository.LichHenRepository;
@@ -38,14 +39,13 @@ import com.dentalclinic.taikhoan.repository.BacSiRepository;
 @RequiredArgsConstructor
 public class LichLamViecService {
     private static final int MAX_RANGE_DAYS = 62;
-    // BR-12: khung khám 30 phút
-    private static final int SLOT_MINUTES = 30;
     // Lịch hẹn chưa khám xong, cần nhân viên xử lý khi buổi làm việc thay đổi
     private static final List<TrangThaiLichHen> PENDING_STATUSES = List.of(TrangThaiLichHen.da_dat, TrangThaiLichHen.da_den);
 
     private final LichLamViecRepository lichLamViecRepository;
     private final LichHenRepository lichHenRepository;
     private final BacSiRepository bacSiRepository;
+    private final ClinicProperties clinicProperties;
 
     // Đọc bác sĩ qua quan hệ lazy nên cần transaction
     @Transactional(readOnly = true)
@@ -161,7 +161,7 @@ public class LichLamViecService {
                 .findByLichLamViec_MaLichAndTrangThaiInOrderByGioHen(scheduleId, PENDING_STATUSES).stream()
                 .filter(appointment -> schedule.getTrangThai() == TrangThaiLich.nghi
                         || appointment.getGioHen().isBefore(start)
-                        || appointment.getGioHen().plusMinutes(SLOT_MINUTES).isAfter(end))
+                        || appointment.getGioHen().plusMinutes(clinicProperties.getSlotMinutes()).isAfter(end))
                 .map(LichHenAnhHuongDto::of)
                 .toList();
         lichLamViecRepository.save(schedule);
