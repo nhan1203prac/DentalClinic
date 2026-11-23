@@ -7,6 +7,8 @@ import { DoctorAdminPage } from './pages/admin/DoctorAdminPage'
 import { ServiceAdminPage } from './pages/admin/ServiceAdminPage'
 import { StaffPage } from './pages/admin/StaffPage'
 import { WeekSchedulePage } from './pages/admin/WeekSchedulePage'
+import { MyAppointmentsPage } from './pages/booking/MyAppointmentsPage'
+import { BookingPage } from './pages/booking/BookingPage'
 import { PublicLayout } from './layouts/PublicLayout'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
@@ -25,6 +27,8 @@ const APP_PAGES = {
   '/app/dich-vu': ServiceAdminPage,
   '/app/lich-tuan': WeekSchedulePage,
   '/app/lich-lam-viec': MySchedulePage,
+  '/app/dat-lich': BookingPage,
+  '/app/lich-kham': MyAppointmentsPage,
 }
 
 // Vào /app thì chuyển tới màn hình đầu tiên trong menu của vai trò
